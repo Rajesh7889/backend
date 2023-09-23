@@ -8,6 +8,14 @@
          useUnifiedTopology:true,
      }
 
-     mongoose.connect(dbUrl,connnectionParams)
-         .then(()=>{console.info('connecte to the db')})
-         .catch((e)=>{console.log('error',e)})
+    const connectDB = async () => {
+            try {
+              const conn = await mongoose.connect(dbUrl,connnectionParams);
+              console.log(`MongoDB Connected: ${conn.connection.host}`);
+            } catch (error) {
+              console.log(error);
+              process.exit(1);
+            }
+          }
+
+          module.exports=connectDB

@@ -4,6 +4,7 @@ var cookieParser = require("cookie-parser");
 const dotenv=require('dotenv')
 dotenv.config({path:'./config.env'})
 const PORT=process.env.PORT
+const connectDB=require("../db/configration")
 
 const app = express();
 app.use(express.json());
@@ -31,4 +32,9 @@ app.use(require("./router/orders/saveorder"))
 app.use(require("./router/seller/saveseller"))
 
 
-app.listen(PORT);
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("listening for requests");
+    })
+})
+
