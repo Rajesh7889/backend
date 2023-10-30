@@ -1,6 +1,6 @@
 const mongoose=require("mongoose")
 const SellerSch= new mongoose.Schema({
-                         UserId:String,
+                         UserId:mongoose.Schema.ObjectId,
                          Ferm:String,
                          TermsNdconditions:Boolean,
                          Accountnmbr:Number,

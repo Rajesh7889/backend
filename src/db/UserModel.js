@@ -5,18 +5,12 @@ const UserSch= new mongoose.Schema({
                          email:String,
                          password:String,
                          nmbr:Number,
-                         tokens:[
-                              {
-                              token:String
-                         }],
-                         liked: {
-                              type: Array,
-                         },
-                         card: {
-                              type: Array,
-                         },
+                         totalOrdrs:Number,
+                         tokens:[{token:String}],
+                         liked: {type: Array,},
+                         card: {type: Array, },
                          Notification:String,
-                         address:{
+                         address:[{
                               Country:String,
                               State:String,
                               District:String,
@@ -24,7 +18,7 @@ const UserSch= new mongoose.Schema({
                               LandMark:String,
                               HouseNmbr:String,
                               pincode:Number
-                           }
+                           },]
                     })
 
  module.exports =mongoose.model("records",UserSch)

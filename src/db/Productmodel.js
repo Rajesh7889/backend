@@ -8,7 +8,7 @@ const productsScheme= new mongoose.Schema({
      subcat:String,
      subcatcod:String,
      about:String,
-     userId:String,
+     userId:mongoose.Schema.ObjectId,
      company:String,
      img:String,
      rating:Number,
