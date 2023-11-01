@@ -21,5 +21,5 @@ const UserSch= new mongoose.Schema({
                            },]
                     })
 
- module.exports =mongoose.model("records",UserSch)
+ module.exports =mongoose.model("usersrecord",UserSch)
 

@@ -4,7 +4,7 @@ const OrderScheme= new mongoose.Schema({
                                         prdctId:mongoose.Schema.ObjectId,
                                         noOfItems:Number,
                                         CnsmrId:mongoose.Schema.ObjectId,
-                                        sellerId:String,
+                                        sellerId:mongoose.Schema.ObjectId,
                                         OrderTracking:{
                                                        lat:Number,
                                                        lng:Number,
