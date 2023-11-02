@@ -6,7 +6,7 @@ const {authJwt,addnewproduct,allproduct,
        searchproduct,deleteproduct,sellerproducts,
        updateproductdetals,searchsellerproducts,
        productdetails,productBycategories,
-       productBysubcaetgories,mltr}=require("../controlers/productscontroler")
+       productBysubcaetgories,addReview}=require("../controlers/productscontroler")
 
 
 router.route("/add-product").post(addnewproduct)
@@ -19,6 +19,7 @@ router.route("/get-products-details/:id").get(productdetails)
 router.route("/subcateries-search/:cat/:subcat").get(productBysubcaetgories)
 router.route("/categorical-search/itm/:key").get(searchproduct)
 router.route("/update-product/:id").put(updateproductdetals)
+router.route("/add-product-review/:id").post(addReview)
 
 
 module.exports = router;

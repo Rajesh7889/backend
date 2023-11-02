@@ -1,6 +1,5 @@
 const Items = require("../../models/Productmodel");
 const Jwt = require("jsonwebtoken")
-const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 
 //token verification..
@@ -16,20 +15,6 @@ exports.authJwt=(req,resp,next)=>{
                        }
        )
  }
-
-
-//multer configration...
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) 
-       {cb(null, "../frontend/src/images/")},
-    filename: function (req, file, cb)
-      {const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + file.originalname)},
- });
-const upload = multer({ storage: storage });
-exports.mltr=(req,resp,next)=>{
-   return upload.single("img")
-}
 
 // adding new product....
 exports.addnewproduct=async (req, resp,next) => {
@@ -68,8 +53,10 @@ exports.allproduct=async(req,resp,next)=>{
       try{
         const products = await Items.find();
          for(let i=0; i<19;i++) {
-            list[i]=  products.filter(itm=>itm.category===(111+i))
-            list[i]=  list[i].length>5? list[i].slice(5):list[i]                  
+          if(products.filter(itm=>itm.category===(111+i)).length)
+           { list[i]=  products.filter(itm=>itm.category===(111+i))
+              list[i]=  list[i].length>5? list[i].slice(5):list[i]
+            }                  
              }  
            lists= Object.values(list)
            resp.send(lists)
@@ -97,7 +84,6 @@ exports.searchproduct=async(req,resp,next)=>{
 //deleting product...
 exports.deleteproduct=async(req,resp,next)=>{
     try{const result = await Items.deleteOne({_id:req.params.id});
-        console.log(result)
         if(result.acknowledged===true){
             resp.send(result.acknowledged)
         }else{
@@ -149,9 +135,11 @@ exports.productBycategories=async(req,resp,next)=>{
     const list={} 
      try { const products = await Items.find({category:req.params.code});
            for(let i=0; i<19;i++) {
-               list[i]= products.filter(itm=>itm.subcatcod===(`a${i}`))
-               list[i]=list[i].length>5? list[i].slice(5):list[i]   
-             }  
+              if(products.filter(itm=>itm.subcatcod===(`a${i}`)).length)
+                { list[i]= products.filter(itm=>itm.subcatcod===(`a${i}`))
+                   list[i]=list[i].length>5? list[i].slice(5):list[i]   
+                 }
+              }  
           lists= Object.values(list)
           resp.send(lists)
      }catch(err){resp.send("Server is not working")}
@@ -186,3 +174,42 @@ exports.updateproductdetals=async(req,resp,next)=>{
       }catch(err){resp.send("Server is not working")}
 }
 
+//adding product reviews if new and updating if already exists....
+exports.addReview=async(req,resp,next)=>{
+  try{
+    let new_rating=null;
+    let product=await Items.find({_id:req.params.id},{_id:0,rating:1,numOfReviews:1});
+      if(product[0].rating){
+         new_rating=((product[0].rating*product[0].numOfReviews)+Number(req.body.rating))/(product[0].numOfReviews+1)
+        }else{
+        new_rating=req.body.rating;
+      };
+         if(req.body._id){
+                  const data = await Items.updateOne(
+                                        {_id:req.params.id},
+                                        {$set:{ rating:Math.round(new_rating),
+                                                'reviews.$[i].rating':req.body.rating,
+                                                'reviews.$[i].comment':req.body.comment,
+                                              }
+                                        },
+                                        {arrayFilters:[{'i._id':req.body._id}]}
+                                       );
+          resp.status(200).send({status:"successfull",message:"review updated successfully"})
+     }else{
+      let totalreviews=product[0].numOfReviews
+                          ?(product[0].numOfReviews+1)
+                          :1;
+      const data = await Items.updateOne({_id:req.params.id},
+                                        { $set:{
+                                            rating:Math.round(new_rating),
+                                            numOfReviews:totalreviews
+                                          },
+                                         $push:{reviews:req.body}
+                                        })
+       resp.status(200).send({status:"successfull",message:"review saved successfully"})
+        }
+           
+    }catch(err){
+      resp.status(500).send({message:"Server is not working"})
+    } 
+  }
