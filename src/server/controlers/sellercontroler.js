@@ -7,9 +7,11 @@ exports.newseller=async(req,resp,next)=>{
     req.body.totalsoldItms=0;
     let seller= new Seller(req.body)
     const result = await seller.save()
+    result?
     resp.status(201).send({status:"success",
                            message:"seller registered successfully"
                           })
+    :resp.status(404).send("something went wrong")
  }catch(err){
     console.log(err)
  }   
