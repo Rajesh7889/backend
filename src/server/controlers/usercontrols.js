@@ -1,6 +1,7 @@
 const User = require("../../models/UserModel");
 const Items = require("../../models/Productmodel");
 const Order = require("../../models/OrderModel");
+const Query = require("../../models/notifications");
 const bcrypt = require("bcrypt");
 let salt=bcrypt.genSaltSync(10)
 const Jwt = require("jsonwebtoken");
@@ -47,36 +48,35 @@ exports.login=async (req, resp,next) =>{
       resp.send("Server is not working");
     }  
   }
+
+
+//Address registered in an active order or not...
+exports.OrdrAdrsActiv=async(req,resp,next)=>{
+  const result=await Order.findOne({OrdrAdrsId:req.params.adrsId})
+  if(result===null||result?.OrdrStatus===false){
+       resp.status(201).json({status:"successful",
+                              data:1
+                            })
+  }else{
+       resp.status(204).json({status:"unsuccessful",
+                              message:"can't delete because order registered with this address"
+                             })
+       }
+}  
+
+
 //delete existing address...
 exports.deleteAddress=async (req, resp,next) => {
     try{
-       const result=await Order.findOne({OrdrAdrsId:req.params.adrsId})
-       let OrdrStatus=false;
-        result?.length
-            &&result.map(itm=>{
-              if(itm.OrdrStatus){
-                OrdrStatus=true
-              }
-            })
-       if(result===null||!OrdrStatus){
            const data = await User.updateOne({_id:req.params.userId},
                                              {"$pull": {"address":{_id:req.params.adrsId}}}
                                             )    
            if(data.acknowledged){
-             const newdata=await User.findOne({_id:req.params.userId})
+               const newdata=await User.findOne({_id:req.params.userId})
                 resp.status(200).json({status:"success",
                                         data:newdata}
                                       )
-           }else{
-               resp.status(404).json({status:"failed",
-                                      message:"donot updated"}
-                                    )
            }
-       }else if(result.OrdrStatus){console.log("order registered")
-          resp.status(204).json({status:"unsuccessful",
-                                 message:"can't delete because order registered with this address"}
-                                )
-       }
     }catch(err){
       resp.status(404).json({status:"failed",
                              message:"server error"})
@@ -219,4 +219,13 @@ exports.neworderaddress=async (req, resp,next) => {
     }catch(err){
       resp.status(500).send({message:"Server is not working"})
     } 
+  }
+
+
+  //user queries haneng....
+  exports.questions=async(req,resp,next)=>{
+    let query_details=await Query(req.body)
+    let result=await query_details.save()
+    console.log(result)
+    resp.status(200).send({status:"sucessfull"})
   }

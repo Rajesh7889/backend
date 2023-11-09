@@ -2,7 +2,7 @@ const mongoose=require("mongoose")
 
 const productsScheme= new mongoose.Schema({
      category:Number,
-     categorytitle:String,
+     categoryTitle:String,
      subcat:String,
      subcatcod:String,
      company:String,

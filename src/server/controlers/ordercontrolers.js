@@ -22,6 +22,7 @@ exports.neworder=async(req,resp,next)=>{
                                                        noOfItems:nmbrofitms[index],
                                                        OrdrDate:new Date(),
                                                        ordrStage:1,
+                                                       OrdrAdrsId:req.body.OrdrAdrsId,
                                                        ordrCnclInfo:{
                                                            reasonCode:null,
                                                            refundMode:null,
@@ -31,11 +32,10 @@ exports.neworder=async(req,resp,next)=>{
                                                        }
                            ))
            })
-           
-               const result = await Order.insertMany(orders)
-               if(result.length){
-               resp.status(200).send({message:"order saved successfully"})
-   }}catch(err){
+               const result = await Order.insertMany(orders);
+               result && resp.status(200).send({message:"order saved successfully"})
+                
+}catch(err){
        resp.status(500).send({message:"server not working"})
    }
    
